@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinFlix - Streaming Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e91e63;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #e91e63;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .nav-icon:hover {
+            opacity: 0.7;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 150px 40px 80px;
+            background: linear-gradient(135deg, #9c27b0 0%, #e91e63 50%, #000 100%);
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '🧛';
+            position: absolute;
+            font-size: 400px;
+            opacity: 0.1;
+            right: -50px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .hero-content {
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            background: #e91e63;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 54px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero-meta {
+            color: #ccc;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .hero-description {
+            color: #ddd;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-play {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-info {
+            background: rgba(109, 109, 110, 0.7);
+            color: #fff;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* Categories */
+        .category {
+            padding: 30px 40px;
+        }
+
+        .category h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .movie-row {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #666 #000;
+        }
+
+        .movie-row::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .movie-row::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .movie-row::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 5px;
+        }
+
+        .movie-row::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+
+        .movie-card {
+            min-width: 280px;
+            height: 160px;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: inherit;
+            filter: brightness(0.8);
+            z-index: -1;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.08);
+            border-color: #fff;
+            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        }
+
+        .movie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .movie-icon {
+            font-size: 48px;
+        }
+
+        .movie-year {
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .movie-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .movie-genre {
+            font-size: 12px;
+            color: #ddd;
+            opacity: 0.8;
+        }
+
+        .movie-title {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 40px 40px;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 120px 20px 60px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero-description {
+                font-size: 16px;
+            }
+
+            .category {
+                padding: 20px;
+            }
+
+            .movie-card {
+                min-width: 220px;
+                height: 130px;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">PINFLIX</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#movies">Movies</a></li>
+            <li><a href="#classics">Classics</a></li>
+            <li><a href="#new">New Arrivals</a></li>
+            <li><a href="#mylist">My List</a></li>
+        </ul>
+        <div class="nav-icons">
+            <div class="nav-icon">🔍</div>
+            <div class="nav-icon">🔔</div>
+            <div class="nav-icon">👤</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="badge">FEATURED</span>
+            <h1>Nosferatu: A Symphony of Horror</h1>
+            <div class="hero-meta">1922 • Horror • Silent Classic</div>
+            <p class="hero-description">
+                The legendary vampire film that started it all. Count Orlok's shadow still haunts cinema over a century later. 
+                Experience the German Expressionist masterpiece that defined horror cinema.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn btn-play">▶ Watch Now</button>
+                <button class="btn btn-info">ℹ More Info</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Container -->
+    <div id="categories"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About PinFlix</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press Kit</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Account</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Settings</a></li>
+                    <li><a href="#">Legal Notices</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <ul>
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">YouTube</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 PinFlix. All movies featured are in the public domain. This is a demonstration project.
+        </div>
+    </footer>
+
+    <script>
+        // Movie Database - Public Domain Films
+        const categories = [
+            {
+                title: "Classic Cinema",
+                movies: [
+                    { title: "Nosferatu", year: "1922", genre: "Horror", icon: "🧛", gradient: "linear-gradient(135deg, #7f1d1d, #000, #581c87)" },
+                    { title: "Metropolis", year: "1927", genre: "Sci-Fi", icon: "🏙️", gradient: "linear-gradient(135deg, #1e3a8a, #581c87, #be185d)" },
+                    { title: "The Cabinet of Dr. Caligari", year: "1920", genre: "Horror", icon: "🎪", gradient: "linear-gradient(135deg, #7f1d1d, #000, #374151)" },
+                    { title: "A Trip to the Moon", year: "1902", genre: "Sci-Fi", icon: "🌙", gradient: "linear-gradient(135deg, #1e3a8a, #581c87, #1e293b)" },
+                    { title: "The Great Train Robbery", year: "1903", genre: "Western", icon: "🚂", gradient: "linear-gradient(135deg, #92400e, #78350f, #451a03)" },
+                    { title: "Battleship Potemkin", year: "1925", genre: "Drama", icon: "⚓", gradient: "linear-gradient(135deg, #374151, #1f2937, #111827)" }
+                ]
+            },
+            {
+                title: "Golden Age Films",
+                movies: [
+                    { title: "His Girl Friday", year: "1940", genre: "Comedy", icon: "📰", gradient: "linear-gradient(135deg, #78350f, #be185d, #581c87)" },
+                    { title: "The Little Shop of Horrors", year: "1960", genre: "Comedy", icon: "🌱", gradient: "linear-gradient(135deg, #065f46, #134e4a, #064e3b)" },
+                    { title: "Night of the Living Dead", year: "1968", genre: "Horror", icon: "🧟", gradient: "linear-gradient(135deg, #7f1d1d, #581c87, #000)" },
+                    { title: "D.O.A.", year: "1950", genre: "Noir", icon: "🕵️", gradient: "linear-gradient(135deg, #1f2937, #111827, #000)" },
+                    { title: "Charade", year: "1963", genre: "Thriller", icon: "💎", gradient: "linear-gradient(135deg, #581c87, #be185d, #7f1d1d)" },
+                    { title: "The Man from Planet X", year: "1951", genre: "Sci-Fi", icon: "👽", gradient: "linear-gradient(135deg, #1e3a8a, #312e81, #1e1b4b)" }
+                ]
+            },
+            {
+                title: "Horror Classics",
+                movies: [
+                    { title: "Carnival of Souls", year: "1962", genre: "Horror", icon: "🎡", gradient: "linear-gradient(135deg, #581c87, #000, #1f2937)" },
+                    { title: "Dementia 13", year: "1963", genre: "Horror", icon: "🏰", gradient: "linear-gradient(135deg, #1e3a8a, #000, #374151)" },
+                    { title: "The Last Man on Earth", year: "1964", genre: "Horror", icon: "🌍", gradient: "linear-gradient(135deg, #92400e, #7f1d1d, #000)" },
+                    { title: "House on Haunted Hill", year: "1959", genre: "Horror", icon: "👻", gradient: "linear-gradient(135deg, #581c87, #374151, #000)" },
+                    { title: "White Zombie", year: "1932", genre: "Horror", icon: "🧟‍♂️", gradient: "linear-gradient(135deg, #1e3a8a, #1e293b, #000)" },
+                    { title: "The Terror", year: "1963", genre: "Horror", icon: "⚡", gradient: "linear-gradient(135deg, #7f1d1d, #581c87, #312e81)" }
+                ]
+            },
+            {
+                title: "Adventure & Action",
+                movies: [
+                    { title: "Captain Kidd", year: "1945", genre: "Adventure", icon: "🏴‍☠️", gradient: "linear-gradient(135deg, #065f46, #1e3a8a, #1e293b)" },
+                    { title: "The Mark of Zorro", year: "1920", genre: "Action", icon: "⚔️", gradient: "linear-gradient(135deg, #7f1d1d, #92400e, #000)" },
+                    { title: "The Phantom of the Opera", year: "1925", genre: "Drama", icon: "🎭", gradient: "linear-gradient(135deg, #be185d, #581c87, #000)" },
+                    { title: "Sherlock Holmes", year: "1916", genre: "Mystery", icon: "🔍", gradient: "linear-gradient(135deg, #78350f, #374151, #1f2937)" },
+                    { title: "Hunchback of Notre Dame", year: "1923", genre: "Drama", icon: "🔔", gradient: "linear-gradient(135deg, #92400e, #374151, #1e293b)" },
+                    { title: "The General", year: "1926", genre: "Comedy", icon: "🚂", gradient: "linear-gradient(135deg, #78350f, #92400e, #451a03)" }
+                ]
+            },
+            {
+                title: "Sci-Fi Pioneers",
+                movies: [
+                    { title: "Plan 9 from Outer Space", year: "1959", genre: "Sci-Fi", icon: "🛸", gradient: "linear-gradient(135deg, #1e3a8a, #581c87, #312e81)" },
+                    { title: "Voyage to the Planet", year: "1965", genre: "Sci-Fi", icon: "🚀", gradient: "linear-gradient(135deg, #312e81, #1e3a8a, #be185d)" },
+                    { title: "The Phantom Planet", year: "1961", genre: "Sci-Fi", icon: "🪐", gradient: "linear-gradient(135deg, #581c87, #be185d, #7f1d1d)" },
+                    { title: "Robot Monster", year: "1953", genre: "Sci-Fi", icon: "🤖", gradient: "linear-gradient(135deg, #1e3a8a, #7f1d1d, #374151)" },
+                    { title: "Santa Claus Conquers", year: "1964", genre: "Sci-Fi", icon: "🎅", gradient: "linear-gradient(135deg, #7f1d1d, #065f46, #1e3a8a)" },
+                    { title: "Teenagers from Outer Space", year: "1959", genre: "Sci-Fi", icon: "👾", gradient: "linear-gradient(135deg, #581c87, #1e3a8a, #be185d)" }
+                ]
+            },
+            {
+                title: "Mystery & Noir",
+                movies: [
+                    { title: "The Stranger", year: "1946", genre: "Noir", icon: "🌃", gradient: "linear-gradient(135deg, #1f2937, #374151, #000)" },
+                    { title: "Detour", year: "1945", genre: "Noir", icon: "🛣️", gradient: "linear-gradient(135deg, #374151, #1f2937, #78350f)" },
+                    { title: "Scared to Death", year: "1947", genre: "Mystery", icon: "💀", gradient: "linear-gradient(135deg, #7f1d1d, #1f2937, #000)" },
+                    { title: "Impact", year: "1949", genre: "Noir", icon: "💥", gradient: "linear-gradient(135deg, #92400e, #374151, #1e293b)" },
+                    { title: "The Narrow Margin", year: "1952", genre: "Noir", icon: "🚃", gradient: "linear-gradient(135deg, #1e293b, #374151, #1f2937)" },
+                    { title: "Gun Crazy", year: "1950", genre: "Noir", icon: "🔫", gradient: "linear-gradient(135deg, #1f2937, #7f1d1d, #000)" }
+                ]
+            },
+            {
+                title: "Western Frontier",
+                movies: [
+                    { title: "Stagecoach", year: "1939", genre: "Western", icon: "🤠", gradient: "linear-gradient(135deg, #92400e, #78350f, #451a03)" },
+                    { title: "Tumbleweeds", year: "1925", genre: "Western", icon: "🌵", gradient: "linear-gradient(135deg, #78350f, #92400e, #065f46)" },
+                    { title: "The Iron Horse", year: "1924", genre: "Western", icon: "🐎", gradient: "linear-gradient(135deg, #78350f, #374151, #1e293b)" },
+                    { title: "Wild West Days", year: "1937", genre: "Western", icon: "⭐", gradient: "linear-gradient(135deg, #92400e, #be185d, #78350f)" },
+                    { title: "Law of the Canyon", year: "1947", genre: "Western", icon: "🏜️", gradient: "linear-gradient(135deg, #92400e, #7f1d1d, #374151)" },
+                    { title: "Headin' East", year: "1937", genre: "Western", icon: "🌅", gradient: "linear-gradient(135deg, #be185d, #92400e, #78350f)" }
+                ]
+            }
+        ];
+
+        // Render categories and movies
+        function renderCategories() {
+            const container = document.getElementById('categories');
+            
+            categories.forEach(category => {
+                const categorySection = document.createElement('section');
+                categorySection.className = 'category';
+                
+                const title = document.createElement('h2');
+                title.textContent = category.title;
+                
+                const movieRow = document.createElement('div');
+                movieRow.className = 'movie-row';
+                
+                category.movies.forEach(movie => {
+                    const card = document.createElement('div');
+                    card.className = 'movie-card';
+                    card.style.background = movie.gradient;
+                    
+                    card.innerHTML = `
+                        <div class="movie-header">
+                            <div class="movie-icon">${movie.icon}</div>
+                            <div class="movie-year">${movie.year}</div>
+                        </div>
+                        <div class="movie-info">
+                            <div class="movie-genre">${movie.genre}</div>
+                            <div class="movie-title">${movie.title}</div>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => {
+                        alert(`Now playing: ${movie.title} (${movie.year})`);
+                    });
+                    
+                    movieRow.appendChild(card);
+                });
+                
+                categorySection.appendChild(title);
+                categorySection.appendChild(movieRow);
+                container.appendChild(categorySection);
+            });
+        }
+
+        // Initialize the app
+        renderCategories();
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>
